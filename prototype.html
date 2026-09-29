@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>AI Innovation Quest — Prototype</title>
+  <style>
+    :root {
+      --bg: #080e20;
+      --panel: #111b32;
+      --border: #283653;
+      --text: #edf2ff;
+      --muted: #a6b5cf;
+      --accent: #79e2cf;
+      --purple: #b4a0ff;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 15px/1.6 system-ui, sans-serif;
+    }
+    button, input, textarea { font: inherit; }
+    button { cursor: pointer; }
+    button:disabled { cursor: not-allowed; opacity: .55; }
+    button:focus-visible, input:focus-visible, textarea:focus-visible,
+    a:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
+    button, .button {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 15px;
+      color: var(--text);
+      background: #1a2946;
+    }
+    .primary { background: var(--accent); color: #08221e; font-weight: 700; }
+    .muted, small { color: var(--muted); }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { font-size: clamp(28px, 4vw, 42px); line-height: 1.2; margin-bottom: 12px; }
+    h2 { font-size: 22px; }
+    h3 { font-size: 17px; margin-bottom: 8px; }
+    .eyebrow {
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+    .layout { display: grid; grid-template-columns: 235px minmax(0, 1fr); min-height: 100vh; }
+    aside {
+      padding: 28px 20px;
+      border-right: 1px solid var(--border);
+      background: #0c1428;
+    }
+    .brand { font-weight: 800; font-size: 19px; margin-bottom: 34px; }
+    .brand span { color: var(--accent); }
+    nav { display: grid; gap: 8px; }
+    nav button { text-align: left; background: transparent; border-color: transparent; }
+    nav button[aria-current="page"] { background: #21314e; color: var(--accent); }
+    .sidebar-note { margin-top: 36px; font-size: 13px; }
+    main { padding: 28px clamp(18px, 4vw, 52px); max-width: 1450px; width: 100%; }
+    header, .section-heading, .row {
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    }
+    header { margin-bottom: 32px; flex-wrap: wrap; }
+    .pill {
+      display: inline-block;
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+    }
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 26px 0; }
+    .panel, .stat, .mission {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px;
+    }
+    .stat strong { display: block; font-size: 26px; }
+    .stat span { font-size: 13px; color: var(--muted); }
+    .copilot { border-left: 3px solid var(--accent); margin-bottom: 24px; }
+    .copilot p { margin-bottom: 0; }
+    .map {
+      position: relative;
+      height: 340px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      margin-bottom: 28px;
+      background:
+        radial-gradient(ellipse at 60% 60%, #402e6955, transparent 65%),
+        radial-gradient(circle at 20px 30px, #cbd9ff88 1px, transparent 2px) 0 0 / 79px 67px,
+        radial-gradient(circle at 40px 15px, #cbd9ff66 1px, transparent 2px) 0 0 / 113px 91px,
+        #0b142b;
+    }
+    .orbit {
+      position: absolute; inset: 45px 8%;
+      border: 1px dashed #62739966;
+      border-radius: 50%;
+      transform: rotate(-12deg);
+      pointer-events: none;
+    }
+    .destination {
+      position: absolute; transform: translate(-50%, -50%);
+      background: transparent; border: 0; padding: 8px;
+      text-align: center; font-size: 13px;
+    }
+    .planet {
+      display: block; width: 65px; height: 65px; border-radius: 50%;
+      margin: 0 auto 10px;
+      box-shadow: inset -12px -10px 18px #0007, 0 0 30px #ffffff12;
+    }
+    .earth { background: linear-gradient(135deg, #8df5d7, #217797); }
+    .violet { background: linear-gradient(135deg, #d6b4ff, #7048bd); width: 84px; height: 84px; }
+    .orange { background: linear-gradient(135deg, #ffe2a7, #d78347); }
+    .unknown { background: #26314a; border: 1px dashed #8392b0; }
+    .map-caption { position: absolute; bottom: 12px; left: 18px; font-size: 12px; color: var(--muted); }
+    .filters { display: flex; gap: 8px; flex-wrap: wrap; margin: 20px 0; }
+    .filters button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+    .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+    .mission { display: flex; flex-direction: column; gap: 12px; }
+    .mission p { font-size: 14px; color: var(--muted); flex: 1; margin: 0; }
+    .mission .points { color: var(--accent); font-weight: 700; white-space: nowrap; }
+    .mission button { width: 100%; }
+    .category { color: var(--purple); font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+    .section-heading { flex-wrap: wrap; margin-bottom: 16px; }
+    .section-heading h2 { margin: 0; }
+    .table-wrap { overflow-x: auto; }
+    table { border-collapse: collapse; width: 100%; text-align: left; }
+    th, td { padding: 16px; border-bottom: 1px solid var(--border); }
+    th { color: var(--muted); font-size: 13px; }
+    tr.you { background: #79e2cf12; color: var(--accent); }
+    progress { width: 100%; height: 12px; accent-color: var(--accent); }
+    .history-item { padding: 16px 0; border-bottom: 1px solid var(--border); }
+    .history-item p { margin: 6px 0 0; overflow-wrap: anywhere; white-space: pre-wrap; }
+    .badge { display: inline-block; margin: 6px 8px 6px 0; padding: 8px 14px; border-radius: 10px; background: #30264b; }
+    dialog {
+      width: min(560px, calc(100% - 32px)); max-height: 90vh;
+      padding: 28px; border-radius: 18px;
+      border: 1px solid var(--border);
+      color: var(--text); background: var(--panel);
+    }
+    dialog::backdrop { background: #020713cc; }
+    label { display: block; margin: 18px 0 8px; }
+    input, textarea {
+      width: 100%; padding: 12px; background: #080f21; color: var(--text);
+      border: 1px solid #52617d; border-radius: 8px;
+    }
+    textarea { min-height: 125px; resize: vertical; }
+    .actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 22px; }
+    #form-error { color: #ffb7b7; margin-top: 10px; }
+    #toast {
+      position: fixed; bottom: 20px; right: 20px; z-index: 10;
+      max-width: min(430px, calc(100% - 40px));
+      background: var(--accent); color: #08221e; border-radius: 12px;
+    }
+    #toast:not(:empty) { padding: 14px 20px; }
+    [hidden] { display: none !important; }
+    .skip-link { position: fixed; top: -100px; z-index: 20; background: var(--bg); padding: 12px; color: white; }
+    .skip-link:focus { top: 10px; }
+
+    @media (max-width: 1100px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 760px) {
+      .layout { grid-template-columns: 1fr; }
+      aside { border-right: 0; border-bottom: 1px solid var(--border); padding: 16px; }
+      .brand { margin-bottom: 12px; }
+      nav { display: flex; flex-wrap: wrap; }
+      .sidebar-note { display: none; }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .grid { grid-template-columns: 1fr; }
+      .planet { width: 48px; height: 48px; }
+      .violet { width: 60px; height: 60px; }
+      .destination { font-size: 11px; }
+      .map { height: 290px; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <div class="layout">
+    <aside>
+      <div class="brand">✦ AI Innovation<br><span>Quest</span></div>
+      <nav aria-label="Main navigation">
+        <button data-page="control" aria-current="page">⌂ Mission Control</button>
+        <button data-page="missions">◎ Mission Board</button>
+        <button data-page="leaderboard">★ Leaderboard</button>
+        <button data-page="journey">◇ My Journey</button>
+      </nav>
+      <div class="sidebar-note">
+        <span class="pill">Interactive prototype</span>
+        <p class="muted">Explore. Experiment.<br>Share what you discover.</p>
+        <button id="reset">Reset demo progress</button>
+      </div>
+    </aside>
+
+    <main id="main" tabindex="-1">
+      <header>
+        <div class="eyebrow">Charting the Future</div>
+        <div class="row">
+          <span class="pill">Season 01 · New Horizons</span>
+          <span>🚀 Alex Morgan <small>· Demo</small></span>
+        </div>
+      </header>
+
+      <section id="intro">
+        <h1>Your next frontier starts here.</h1>
+        <p class="muted">Build practical AI skills. Complete missions. Help shape what comes next.</p>
+      </section>
+
+      <section class="stats" aria-label="Your progress">
+        <div class="stat"><strong id="season-points">0</strong><span>Season points</span></div>
+        <div class="stat"><strong id="rank">Beginner</strong><span>Lifetime rank</span></div>
+        <div class="stat"><strong id="completed">0 / 6</strong><span>Missions completed</span></div>
+        <div class="stat"><strong id="badge-count">0</strong><span>Badges earned</span></div>
+      </section>
+
+      <section id="control-view">
+        <div class="panel copilot">
+          <h3>🤖 NOVA · Your mission copilot</h3>
+          <p id="copilot-text"></p>
+          <small>Scripted guidance · Not a live AI chatbot</small>
+        </div>
+        <div class="section-heading">
+          <h2>Explore the star system</h2>
+          <span class="muted">Region 01 · The Discovery Belt</span>
+        </div>
+        <div class="map" aria-label="Destinations; all missions are also available on the Mission Board">
+          <div class="orbit" aria-hidden="true"></div>
+          <button class="destination" style="left:16%;top:57%" data-destination="Learn">
+            <span class="planet earth" aria-hidden="true"></span>Learning Station
+          </button>
+          <button class="destination" style="left:43%;top:35%" data-destination="Practice">
+            <span class="planet violet" aria-hidden="true"></span>Practice Prime
+          </button>
+          <button class="destination" style="left:70%;top:61%" data-destination="Share">
+            <span class="planet orange" aria-hidden="true"></span>Sharing Outpost
+          </button>
+          <button class="destination" style="left:88%;top:25%" id="future">
+            <span class="planet unknown" aria-hidden="true"></span>Uncharted
+          </button>
+          <span class="map-caption">Select a destination to discover missions</span>
+        </div>
+      </section>
+
+      <section id="missions-view">
+        <div class="section-heading">
+          <h2 id="missions-heading">Your mission board</h2>
+          <span class="muted">Small steps. Real workplace impact.</span>
+        </div>
+        <div class="filters" aria-label="Filter missions">
+          <button data-filter="All" aria-pressed="true">All missions</button>
+          <button data-filter="Learn" aria-pressed="false">Learn</button>
+          <button data-filter="Practice" aria-pressed="false">Practice</button>
+          <button data-filter="Share" aria-pressed="false">Share</button>
+          <button data-filter="Transform" aria-pressed="false">Transform</button>
+        </div>
+        <div id="mission-grid" class="grid"></div>
+      </section>
+
+      <section id="leaderboard-view" hidden>
+        <div class="section-heading">
+          <h2>Season leaderboard</h2>
+          <span class="pill">Illustrative participants</span>
+        </div>
+        <p class="muted">A fresh season means a fresh start. Your lifetime rank and badges stay with you.</p>
+        <div class="panel table-wrap">
+          <table>
+            <caption class="muted">Demo standings · Ties share the same position</caption>
+            <thead><tr><th scope="col">Position</th><th scope="col">Explorer</th><th scope="col">Season points</th></tr></thead>
+            <tbody id="leaderboard-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="journey-view" hidden>
+        <h2>Your personal journey</h2>
+        <div class="panel">
+          <h3>🚀 Starling · Your exploration ship</h3>
+          <p id="rank-description" class="muted"></p>
+          <progress id="rank-progress" max="100" value="0" aria-label="Progress toward next rank"></progress>
+          <h3 style="margin-top:24px">Recognition</h3>
+          <div id="badges"></div>
+          <h3 style="margin-top:24px">Mission log</h3>
+          <div id="history"></div>
+        </div>
+      </section>
+
+      <footer style="margin-top:32px">
+        <small>Demo only · Progress is stored in this browser when available. Do not enter confidential information.</small>
+      </footer>
+    </main>
+  </div>
+
+  <dialog id="mission-dialog" aria-labelledby="dialog-title">
+    <form id="mission-form">
+      <span id="dialog-category" class="eyebrow"></span>
+      <h2 id="dialog-title" style="margin-top:12px"></h2>
+      <p id="dialog-description" class="muted"></p>
+      <div id="dialog-reward" class="pill"></div>
+      <p id="dialog-require
